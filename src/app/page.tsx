@@ -3,10 +3,9 @@ import { Zap, BarChart3, Settings2 } from "lucide-react";
 import { getHeroes } from "@/lib/services";
 
 export default async function Home() {
-  let mainHero = undefined;
+  let heroes = undefined;
   try {
-    const heroes = await getHeroes();
-    mainHero = heroes.find(h => h.isActive);
+    heroes = await getHeroes();
   } catch (error) {
     console.error("Failed to fetch heroes:", error);
   }
@@ -15,7 +14,7 @@ export default async function Home() {
     <div className="flex flex-col gap-0">
       {/* Hero Section */}
       <section className="w-full">
-        <HeroSlider hero={mainHero} />
+        <HeroSlider heroes={heroes} />
       </section>
 
       {/* Intro Text */}

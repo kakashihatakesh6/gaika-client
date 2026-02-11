@@ -21,49 +21,53 @@ interface Slide {
 import { Hero } from "@/types";
 
 interface HeroSliderProps {
-    hero?: Hero;
+    heroes?: Hero[];
 }
 
-const defaultSlides: Slide[] = [
-    {
-        id: 1,
-        type: "strip",
-        title: "Global Overview",
-        verticalText: "Global Overview",
-    },
-    {
-        id: 2,
-        type: "main",
-        title: "AI-First.\nResults-Driven.",
-        subtitle: "Unlike traditional consultancies, we embed artificial intelligence at the core of every solution we build.",
-        cta: "Get Free AI Assessment",
-    },
-    {
-        id: 3,
-        type: "strip",
-        title: "Industries",
-        verticalText: "Industries",
-    },
-    {
-        id: 4,
-        type: "strip",
-        title: "Solutions",
-        verticalText: "Solutions",
-    },
-];
+// Helper function to convert Hero API data to Slide format
+const convertHeroToSlide = (hero: Hero, index: number): Slide => ({
+    id: index,
+    type: "main",
+    title: hero.title,
+    subtitle: hero.description,
+    image: hero.mediaUrl,
+    cta: hero.ctaText,
+});
 
-export function HeroSlider({ hero }: HeroSliderProps) {
-    const [activeId, setActiveId] = useState<number>(2);
+export function HeroSlider({ heroes }: HeroSliderProps) {
+    // Build slides from API heroes only
+    let slides: Slide[] = [];
+    let initialActiveId = 0;
 
-    const slides = [...defaultSlides];
-    if (hero) {
-        slides[1] = {
-            ...slides[1],
-            title: hero.title || slides[1].title,
-            subtitle: hero.description || slides[1].subtitle,
-            image: hero.mediaUrl, // mediaUrl from DB -> image
-            cta: hero.ctaText || slides[1].cta,
-        };
+    if (heroes && heroes.length > 0) {
+        // Filter only active heroes and sort by displayOrder
+        const activeHeroes = heroes
+            .filter(h => h.isActive)
+            .sort((a, b) => a.displayOrder - b.displayOrder);
+
+        // Convert heroes to slides
+        slides = activeHeroes.map((hero, index) => convertHeroToSlide(hero, index));
+
+        // Set initial active slide to the second one (index 1), or first if only one slide exists
+        if (slides.length > 1) {
+            initialActiveId = slides[1].id;
+        } else if (slides.length > 0) {
+            initialActiveId = slides[0].id;
+        }
+    }
+
+    const [activeId, setActiveId] = useState<number>(initialActiveId);
+
+    // If no slides available, show empty state
+    if (slides.length === 0) {
+        return (
+            <div className="w-full h-[600px] md:h-[700px] bg-background text-foreground flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-muted-foreground text-lg">No hero slides available.</p>
+                    <p className="text-sm text-muted-foreground mt-2">Create slides in the admin panel to display them here.</p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -104,41 +108,40 @@ export function HeroSlider({ hero }: HeroSliderProps) {
                         {/* Overlay for Inactive Slides */}
                         <div className={cn(
                             "absolute inset-0 transition-colors duration-300 z-10",
-                            isActive ? "bg-black/20" : "bg-black/60 hover:bg-black/40"
+                            isActive ? "bg-black/20" : "bg-black/80 hover:bg-black/60"
                         )} />
 
                         {/* Content Container */}
                         <div className="relative z-20 h-full p-6 flex flex-col justify-between">
 
                             {/* Top Section */}
-                            <div className="flex justify-between items-start">
-                                {/* Vertical Text for strips (Active or Inactive) */}
-                                {!isActive && slide.verticalText && (
-                                    <div className="writing-vertical-rl text-xs font-bold tracking-widest uppercase text-muted-foreground opacity-70 rotate-180 absolute top-24 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                                        {slide.verticalText}
+                            <div className="flex justify-between items-start h-[100px]">
+                                {/* Show title when inactive */}
+                                {!isActive && (
+                                    <div className="writing-vertical-rl text-lg font-bold tracking-widest text-[#cccccc] opacity-80 rotate-180 absolute top-32 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                                        {slide.title}
                                     </div>
-                                )}
-
-                                {isActive && slide.type === 'strip' && (
-                                    <h2 className="text-2xl font-bold">{slide.title}</h2>
                                 )}
 
                                 {/* Small Label for Main Slide */}
                                 {isActive && slide.type === 'main' && (
-                                    <span className="px-3 py-1 rounded-full border border-white/20 bg-black/40 text-xs backdrop-blur-sm">
-                                        Services
-                                    </span>
+                                    <div className="flex w-full justify-end">
+                                        <span className="px-5 py-2 rounded-lg border border-white/10 bg-black/60 text-sm font-medium backdrop-blur-md">
+                                            Services
+                                        </span>
+                                    </div>
+
                                 )}
                             </div>
 
                             {/* Middle/Main Content for Active Main Slide */}
                             {isActive && slide.type === 'main' && (
-                                <div className="max-w-2xl mt-12 md:mt-0">
+                                <div className="max-w-2xl mt-12 md:mt-0 px-4">
                                     <motion.h1
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.2 }}
-                                        className="text-4xl md:text-6xl font-bold leading-tight mb-6 whitespace-pre-line"
+                                        className="text-5xl md:text-7xl font-bold leading-tight mb-6 whitespace-pre-line"
                                     >
                                         {slide.title}
                                     </motion.h1>
@@ -146,7 +149,7 @@ export function HeroSlider({ hero }: HeroSliderProps) {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.3 }}
-                                        className="text-lg text-gray-300 mb-8 max-w-lg"
+                                        className="text-xl text-gray-300 mb-8 max-w-lg leading-relaxed"
                                     >
                                         {slide.subtitle}
                                     </motion.p>
@@ -155,7 +158,7 @@ export function HeroSlider({ hero }: HeroSliderProps) {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.4 }}
                                     >
-                                        <Button className="rounded-full px-8 py-6 text-base bg-blue-600 hover:bg-blue-700 shadow-[0_0_30px_rgba(37,99,235,0.4)]">
+                                        <Button className="rounded-full px-8 py-7 text-lg bg-blue-600 hover:bg-blue-700 shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all">
                                             {slide.cta} <span className="ml-2">↗</span>
                                         </Button>
                                     </motion.div>
@@ -163,15 +166,17 @@ export function HeroSlider({ hero }: HeroSliderProps) {
                             )}
 
                             {/* Bottom Section (Plus Button) */}
-                            <div className="flex justify-end md:justify-start">
-                                <button
-                                    className={cn(
-                                        "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                                        isActive ? "bg-blue-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
-                                    )}
-                                >
-                                    <Plus className={cn("w-5 h-5 transition-transform", isActive ? "rotate-45" : "rotate-0")} />
-                                </button>
+                            <div className="flex justify-center md:justify-center mb-8">
+                                {!isActive && (
+                                    <button
+                                        className={cn(
+                                            "w-12 h-12 rounded-full flex items-center justify-center transition-colors bg-blue-600 text-white hover:bg-blue-700 shadow-lg"
+                                        )}
+                                    >
+                                        <Plus className={cn("w-6 h-6 transition-transform", isActive ? "rotate-45" : "rotate-0")} />
+                                    </button>
+                                )}
+
                             </div>
 
                         </div>
