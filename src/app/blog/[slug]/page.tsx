@@ -1,9 +1,13 @@
-import { mockBlogs } from "@/lib/mockData";
+import { getBlogBySlug } from "@/lib/services";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, User, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 interface PageProps {
     params: Promise<{
@@ -13,7 +17,13 @@ interface PageProps {
 
 export default async function BlogDetailPage(props: PageProps) {
     const params = await props.params;
-    const blog = mockBlogs.find((b) => b.slug === params.slug);
+
+    let blog;
+    try {
+        blog = await getBlogBySlug(params.slug);
+    } catch (error) {
+        notFound();
+    }
 
     if (!blog) {
         notFound();
@@ -24,7 +34,7 @@ export default async function BlogDetailPage(props: PageProps) {
             {/* Hero Header */}
             <div className="relative h-[400px] md:h-[500px] w-full">
                 <Image
-                    src={blog.image}
+                    src={blog.featuredImage || "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800"} // Fallback image
                     alt={blog.title}
                     fill
                     className="object-cover"
@@ -34,7 +44,7 @@ export default async function BlogDetailPage(props: PageProps) {
                 <div className="absolute inset-0 flex flex-col justify-center items-center text-center p-4">
                     <div className="max-w-4xl space-y-4">
                         <span className="bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide">
-                            {blog.category}
+                            {blog.category || "General"}
                         </span>
                         <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">
                             {blog.title}
@@ -46,11 +56,11 @@ export default async function BlogDetailPage(props: PageProps) {
                             </div>
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-4 h-4" />
-                                <span>{blog.date}</span>
+                                <span>{new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4" />
-                                <span>{blog.readTime}</span>
+                                <span>{blog.readTime || "5 min read"}</span>
                             </div>
                         </div>
                     </div>
@@ -65,28 +75,23 @@ export default async function BlogDetailPage(props: PageProps) {
                         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Insights
                     </Link>
 
-                    <div className="prose prose-invert max-w-none text-lg leading-relaxed">
-                        <p className="lead text-xl text-muted-foreground font-medium mb-8">
-                            {blog.excerpt}
-                        </p>
-                        <div className="space-y-6 text-gray-300">
-                            <p>
-                                In today's rapidly evolving digital landscape, staying ahead of the curve is no longer just an advantage—it's a necessity. This article explores the transformative power of {blog.category} and how it is reshaping industries worldwide.
-                            </p>
-                            <h2 className="text-2xl font-bold text-white mt-8 mb-4">Key Takeaways</h2>
-                            <ul className="list-disc pl-6 space-y-2">
-                                <li>Understanding the core principles of modern digital transformation.</li>
-                                <li>Leveraging data-driven insights for strategic decision making.</li>
-                                <li>Overcoming common challenges in large-scale implementation.</li>
-                            </ul>
-                            <p>
-                                As we continue to push the boundaries of what's possible, organizations must adapt their strategies to leverage these new technologies effectively. The future belongs to those who are willing to innovate and embrace change.
-                            </p>
-                            <h2 className="text-2xl font-bold text-white mt-8 mb-4">Conclusion</h2>
-                            <p>
-                                The journey towards digital excellence is ongoing. By adopting a proactive approach and partnering with the right experts, your organization can potential unlock new opportunities and drive sustainable growth.
-                            </p>
-                        </div>
+                    <div className="prose prose-lg max-w-none 
+                        prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground 
+                        prose-p:text-muted-foreground prose-p:leading-relaxed 
+                        prose-strong:text-foreground 
+                        prose-li:text-muted-foreground
+                        prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline hover:prose-a:text-primary/80 transition-colors
+                        prose-blockquote:border-l-primary prose-blockquote:bg-muted/50 prose-blockquote:p-6 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-muted-foreground
+                        prose-img:rounded-xl prose-img:shadow-lg prose-img:border prose-img:border-border
+                        prose-code:bg-muted prose-code:text-foreground prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
+                        prose-pre:bg-muted/50 prose-pre:border prose-pre:border-border prose-pre:text-foreground
+                        ">
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeHighlight]}
+                        >
+                            {blog.content}
+                        </ReactMarkdown>
                     </div>
 
                     {/* Share/CTA */}
