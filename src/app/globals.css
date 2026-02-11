@@ -53,7 +53,7 @@
 }
 
 .dark {
-  --background: #020617;
+  --background: #020617; /* Very dark blue/black */
   --foreground: #f8fafc;
   
   --card: #0f172a;
@@ -62,7 +62,7 @@
   --popover: #0f172a;
   --popover-foreground: #f8fafc;
   
-  --primary: #2563eb;
+  --primary: #3b82f6; /* Brighter blue for dark mode */
   --primary-foreground: #ffffff;
   
   --secondary: #1e293b;
@@ -79,7 +79,7 @@
   
   --border: #1e293b;
   --input: #1e293b;
-  --ring: #2563eb;
+  --ring: #3b82f6;
 }
 
 body {
