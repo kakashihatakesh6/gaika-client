@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Giakaa Clone - Frontend
 
-## Getting Started
+A modern, production-grade Next.js frontend for the Giakaa Clone & CMS project.
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at **http://localhost:3000**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📋 Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18+ 
+- Backend server running on port 5000 (see `/server` directory)
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **HTTP Client**: Axios
+- **UI Components**: Custom components with Radix UI primitives
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── admin/             # CMS admin panel
+│   ├── blog/              # Blog listing & detail pages
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Landing page
+├── components/
+│   ├── features/          # Feature components (HeroSlider, BlogCard)
+│   ├── layout/            # Layout components (Header, Footer)
+│   └── ui/                # Reusable UI components (Button)
+├── lib/
+│   ├── api.ts             # Axios instance
+│   ├── utils.ts           # Utility functions
+│   └── mockData.ts        # Mock data for development
+└── hooks/                 # Custom React hooks
+```
 
-## Deploy on Vercel
+## 🎨 Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ✅ Responsive landing page with interactive hero slider
+- ✅ Blog listing and detail pages
+- ✅ Admin panel for content management
+- ✅ Dark theme with custom Tailwind configuration
+- ✅ API integration ready (proxied to backend)
+- ✅ SEO-friendly with dynamic metadata
+- ✅ Type-safe with TypeScript
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
+
+### Backend Connection
+
+The app is configured to proxy API requests to `http://localhost:5000/api` via Next.js rewrites in `next.config.ts`.
+
+## 📝 Available Routes
+
+- `/` - Landing page
+- `/blog` - Blog listing
+- `/blog/[slug]` - Blog detail page
+- `/admin` - Admin dashboard
+- `/admin/blogs` - Blog management
+- `/admin/hero` - Hero slider management
+
+## 🧪 Testing
+
+```bash
+# Run tests (when implemented)
+npm test
+
+# Run E2E tests (when implemented)
+npm run test:e2e
+```
+
+## 📦 Build & Deploy
+
+```bash
+# Create production build
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🤝 Contributing
+
+1. Follow the existing code structure
+2. Use TypeScript for all new files
+3. Follow the component naming conventions
+4. Test your changes before committing
+
+## 📄 License
+
+This project is part of the Giakaa Clone & CMS application.
